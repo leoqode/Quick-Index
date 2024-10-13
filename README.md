@@ -1,6 +1,5 @@
 # 🚀 Type Racer Pro
 
-![Type Racer Pro Banner](https://via.placeholder.com/800x200.png?text=Type+Racer+Pro)
 
 ## 🎯 Vision
 
@@ -80,6 +79,5 @@ This project is licensed under the MIT License - see the [LICENSE.md](LICENSE.md
   Made with ❤️ by typing enthusiasts, for typing enthusiasts
 </p>
 
-![Typing Heatmap](https://via.placeholder.com/800x400.png?text=Typing+Heatmap+Visualization)
 
 > "The keyboard is mightier than the sword, especially when wielded with the precision of a Typing Pro master." - Ancient Programmer Proverb
