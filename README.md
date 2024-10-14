@@ -78,4 +78,3 @@ This project is licensed under the MIT License - see the [LICENSE.md](LICENSE.md
 
 
 
-> "The keyboard is mightier than the sword, especially when wielded with the precision of a Typing Pro master." - Ancient Programmer Proverb
