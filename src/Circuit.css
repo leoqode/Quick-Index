@@ -91,3 +91,34 @@ button:hover {
     border-color: transparent;
   }
 }
+
+.incorrect-counts {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  list-style-type: none;
+  padding: 0;
+}
+
+.incorrect-counts li {
+  background-color: #e0e0e0;
+  border-radius: 4px;
+  padding: 8px 12px;
+  font-size: 14px;
+  transition: transform 0.2s ease-in-out;
+}
+.incorrect-counts {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  list-style-type: none;
+  padding: 0;
+}
+
+.incorrect-counts li {
+  background-color: #e0e0e0;
+  border-radius: 4px;
+  padding: 8px 12px;
+  font-size: 14px;
+  transition: transform 0.2s ease-in-out;
+}

@@ -7,6 +7,8 @@ const Circuit: React.FC = () => {
   const [startTime, setStartTime] = useState<number | null>(null);
   const [wpm, setWpm] = useState<number | null>(null);
 
+  const wordImprovementMap : {[key : string]: number} = {};
+
   const fetchQuote = async () => {
     try {
       const response = await fetch('https://recite.onrender.com/api/v1/random');
@@ -72,6 +74,9 @@ const Circuit: React.FC = () => {
 
             if (overallIndex < userInput.length) {
               charClassName = userInput[overallIndex] === char ? 'correct' : 'incorrect';
+              if (charClassName === 'incorrect') {
+                wordImprovementMap[char] = (wordImprovementMap[char] || 0) + 1;
+              }
             } else if (overallIndex === userInput.length) {
               charClassName = 'current';
             }
@@ -104,6 +109,14 @@ const Circuit: React.FC = () => {
 
       {wpm !== null && (
         <div className="wpm-display">
+          <p>Characters in which you can improve on:</p>
+          <ul className ='incorrect-counts'>
+            {Object.entries(wordImprovementMap).map(([char, improvement]) => (
+              <li key={char}>
+                {char}: {improvement}
+              </li>
+            ))}
+          </ul>
           <p>Your WPM: {wpm}</p>
           <button onClick={resetTest}>Try Another Quote</button>
         </div>
