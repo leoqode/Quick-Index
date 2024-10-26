@@ -1,13 +1,24 @@
 import React, { useState, useEffect } from 'react';
 import './Circuit.css';
 
+
+
+
 const Circuit: React.FC = () => {
+  type specialChar = '’' | '“' | '”' | '—' | '…';
+  const specialCharsMap: Record<specialChar, string> = {
+    '’': '\'',
+    '“': '"',
+    '”': '"',
+    '—': '-',   
+    '…': '...',
+  };
+  
+  
   const [quoteToType, setQuoteToType] = useState('');
   const [userInput, setUserInput] = useState('');
   const [startTime, setStartTime] = useState<number | null>(null);
   const [wpm, setWpm] = useState<number | null>(null);
-  const incorrectChar = /’/i;
-
 
   const wordImprovementMap : {[key : string]: number} = {};
 
@@ -16,8 +27,8 @@ const Circuit: React.FC = () => {
       const response = await fetch('https://recite.onrender.com/api/v1/random');
       const data = await response.json();
       if (response.ok) {
-        const quote = data.quote;
-        setQuoteToType(quote.replace(incorrectChar, '\''));
+        const quote = data.quote.replace(/[’“”—…]/g, (char: specialChar) => specialCharsMap[char]);
+        setQuoteToType(quote);
       } else {
         console.error('Failed to fetch the quote.');
       }
@@ -58,15 +69,19 @@ const Circuit: React.FC = () => {
   };
 
   const renderQuote = () => {
+    console.log(userInput);
+    console.log()
     const words = quoteToType.split(' ');
     const inputWords = userInput.split(' ');
     
     return words.map((word, wordIndex) => {
       let wordClassName = '';
-      if (wordIndex === inputWords.length - 1) {
+
+      if (wordIndex < inputWords.length - 1){
         wordClassName = 'current-word';
-      } else if (wordIndex < inputWords.length) {
-        wordClassName = 'completed-word';
+      } else if( word === inputWords[-1]){
+        const currentInputWord = inputWords[wordIndex];
+        wordClassName = currentInputWord === word ? 'completed-word' : '';
       }
 
       return (
