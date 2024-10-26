@@ -6,6 +6,8 @@ const Circuit: React.FC = () => {
   const [userInput, setUserInput] = useState('');
   const [startTime, setStartTime] = useState<number | null>(null);
   const [wpm, setWpm] = useState<number | null>(null);
+  const incorrectChar = /’/i;
+
 
   const wordImprovementMap : {[key : string]: number} = {};
 
@@ -14,7 +16,8 @@ const Circuit: React.FC = () => {
       const response = await fetch('https://recite.onrender.com/api/v1/random');
       const data = await response.json();
       if (response.ok) {
-        setQuoteToType(data.quote);
+        const quote = data.quote;
+        setQuoteToType(quote.replace(incorrectChar, '\''));
       } else {
         console.error('Failed to fetch the quote.');
       }
