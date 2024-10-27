@@ -1,5 +1,5 @@
 # 🚀 Type Racer Pro
-
+![image](https://github.com/user-attachments/assets/1278b424-ea41-4a49-b0c5-dd9abf74cfb3)
 
 ## 🎯 Vision
 
