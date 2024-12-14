@@ -1,9 +1,10 @@
-# 🚀 Type Racer Pro
+![image](https://github.com/user-attachments/assets/f960dd3f-589f-49f4-9225-86da32ccc822)
 
+![image](https://github.com/user-attachments/assets/1278b424-ea41-4a49-b0c5-dd9abf74cfb3)
 
 ## 🎯 Vision
 
-Type Racer Pro is not just another typing test - it's your personal typing coach powered by cutting-edge machine learning. Our goal is to revolutionize how people improve their typing skills by providing deep, personalized insights into every aspect of your typing technique.
+Quick Index is not just another typing test - it's your personal typing coach powered by cutting-edge machine learning. Our goal is to revolutionize how people improve their typing skills by providing deep, personalized insights into every aspect of your typing technique.
 
 ## 🌟 Features
 
@@ -49,9 +50,10 @@ Type Racer Pro is not just another typing test - it's your personal typing coach
    - Develop modes for users with different abilities
    - Implement voice-guided tutorials
 
-## 💡 The Science Behind Type Racer Pro
+## 💡 The Science Behind Quick Index
 
-Type Racer Pro leverages the power of machine learning to analyze numerous variables that contribute to typing speed and accuracy:
+
+Quick Index leverages the power of machine learning to analyze numerous variables that contribute to typing speed and accuracy:
 
 - 🔤 Letter transition frequencies
 - 👆 Finger movement patterns
