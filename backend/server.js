@@ -395,6 +395,48 @@ app.get("/api/race-history", authMiddleware, async (req, res) => {
   }
 });
 
+app.get("/api/leaderboard", authMiddleware, async (req, res) => {
+  try {
+    const { page = 1, limit = 10 } = req.query;
+    const skip = (page - 1) * limit;
+
+    // Join with User to get usernames
+    const races = await raceHistory.aggregate([
+      {
+        $lookup: {
+          from: "users", 
+          localField: "userId",
+          foreignField: "_id",
+          as: "user"
+        }
+      },
+      { $unwind: "$user" },
+      {
+        $project: {
+          id: "$_id",
+          username: "$user.username",
+          wpm: 1,
+          accuracy: 1,
+          date: 1
+        }
+      },
+      { $sort: { wpm: -1 } }, 
+      { $skip: parseInt(skip) },
+      { $limit: parseInt(limit) }
+    ]);
+
+    const totalCount = await raceHistory.countDocuments();
+
+    res.status(200).json({ 
+      races,
+      totalCount 
+    });
+  } catch (error) {
+    console.error("Error fetching leaderboard:", error);
+    res.status(500).json({ error: "Failed to fetch leaderboard" });
+  }
+});
+
 
 app.listen(PORT, () => {
   console.log(`Server running on http://localhost:${PORT}`);

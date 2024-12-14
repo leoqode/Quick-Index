@@ -1,5 +1,4 @@
 import React, { useState, useEffect, useRef } from "react";
-import "./Circuit.css";
 import Keyboard from "./KeyboardDiagram";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "./AuthContext";

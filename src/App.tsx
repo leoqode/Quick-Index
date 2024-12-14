@@ -7,7 +7,7 @@ import ProfilePage from "./Profile";
 import { AuthProvider } from "./AuthContext";
 import ProtectedRoute from "./ProtectedRoute";
 import Circuit from "./Circuit";
-
+import Leaderboard from "./Leaderboard";
 const App: React.FC = () => {
   return (
     <Router>
@@ -27,6 +27,14 @@ const App: React.FC = () => {
             element={
               <ProtectedRoute>
                 <ProfilePage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/leaderboard"
+            element={
+              <ProtectedRoute>
+                <Leaderboard/>
               </ProtectedRoute>
             }
           />
