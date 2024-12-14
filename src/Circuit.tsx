@@ -1,8 +1,13 @@
-import React, { useState, useEffect, useRef, HtmlHTMLAttributes } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import "./Circuit.css";
-import KeyboardDiagram from "./KeyboardDiagram";
-
+import Keyboard from "./KeyboardDiagram";
+import { useNavigate } from "react-router-dom";
+import { useAuth } from "./AuthContext";
+import axios from "axios";
 const Circuit: React.FC = () => {
+  const { isAuthenticated } = useAuth(); // Assuming `useAuth` provides this
+  const navigate = useNavigate();
+  const {token} = useAuth();
   const [quoteToType, setQuoteToType] = useState("");
   const [userInput, setUserInput] = useState("");
   const [currentInputWord, setCurrentInputWord] = useState("");
@@ -27,7 +32,7 @@ const Circuit: React.FC = () => {
   const audioRef = useRef<HTMLAudioElement | null>(null);
 
   useEffect(() => {
-    audioRef.current = new Audio("/public/audiomass-output.mp3");
+    audioRef.current = new Audio("/audiomass-output.mp3");
   }, []);
 
   function getKeyLabel(char: string): string {
@@ -91,19 +96,36 @@ const Circuit: React.FC = () => {
     }
   }
 
+  const handleLogoClick = () => {
+    if (isAuthenticated) {
+      navigate("/main-page"); // Replace "/main" with the route for the main page
+    } else {
+      navigate("/"); // Replace "/splash" with the route for the splash page
+    }
+  };
+
   const fetchQuote = async () => {
     try {
-      const response = await fetch("https://recite.onrender.com/api/v1/random");
+      // Fetch the quote of the day
+      const response = await fetch("Http://localhost:5000/api/qotd", {
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+
       const data = await response.json();
-      if (response.ok) {
-        const quote = data.quote.replace(
+
+      if (response.ok && data?.quote?.body) {
+        const quote = data.quote.body.replace(
           /[’“”—…]/g,
           (char: SpecialChar) => specialCharsMap[char]
         );
         setQuoteToType(quote);
         setIsQuoteLoaded(true);
       } else {
-        console.error("Failed to fetch the quote.");
+        console.error(
+          "Failed to fetch the quote or invalid response structure."
+        );
       }
     } catch (error) {
       console.error("Error fetching quote:", error);
@@ -119,7 +141,7 @@ const Circuit: React.FC = () => {
     const actualChars = currentInput.split("");
     const newWordImprovementMap = { ...wordImprovementMap };
     const newMistypedKeyLabels = new Set<string>(mistypedKeyLabels);
-  
+
     expectedChars.forEach((char, index) => {
       if (actualChars[index] !== char) {
         if (newWordImprovementMap[char]) {
@@ -133,7 +155,7 @@ const Circuit: React.FC = () => {
         }
       }
     });
-  
+
     setWordImprovementMap(newWordImprovementMap);
     setMistypedKeyLabels(newMistypedKeyLabels);
   };
@@ -143,9 +165,8 @@ const Circuit: React.FC = () => {
       audioRef.current.play();
     }
   };
-  
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleInputChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
     setCurrentInputWord(value);
 
@@ -161,7 +182,6 @@ const Circuit: React.FC = () => {
     const currentWordIndex = userWords.length;
     const currentTargetWord = quoteWords[currentWordIndex];
 
-    // Update mistakes in real-time
     updateMistakes(userInput + value);
 
     if (value.endsWith(" ")) {
@@ -176,7 +196,35 @@ const Circuit: React.FC = () => {
       const timeTaken = (Date.now() - (startTime as number)) / 1000 / 60;
       const wordsTyped = quoteToType.trim().split(/\s+/).length;
       const calculatedWPM = Math.round(wordsTyped / timeTaken);
+      const secondsTaken = timeTaken * 60; 
       setWpm(calculatedWPM);
+
+      const accuracy = Math.round(
+        (userInput.length / quoteToType.length) * 100
+      );
+      const charsToImprove = Array.from(mistypedKeyLabels);
+      const date = new Date().toISOString();
+
+      const raceData = {
+        date,
+        wpm : calculatedWPM,
+        accuracy,
+        timetocomplete: secondsTaken,
+        quote: quoteToType,
+        charsToImprove: charsToImprove,
+      };
+
+      try {
+        console.log(date, calculatedWPM, accuracy, secondsTaken, quoteToType, charsToImprove)
+        const response = await axios.post("http://localhost:3001/api/race", raceData, {
+          headers: {
+            Authorization: `Bearer ${token}`, // Ensure token is sent here
+          },
+        });
+        console.log("Race successfully saved to userId", response.data);
+      } catch (error) {
+        console.error("Something went wrong saving the race", error);
+      }
     }
   };
 
@@ -204,7 +252,7 @@ const Circuit: React.FC = () => {
         handleKeyPress();
       } else if (inputString[charIndex]) {
         foundError = true;
-        charClassName += " text-red-500";
+        charClassName += " text-red-500 underline";
       } else {
         charClassName += " text-gray-400";
       }
@@ -224,12 +272,17 @@ const Circuit: React.FC = () => {
   return (
     <div className='min-h-screen bg-gray-900 text-white p-8'>
       <div className='max-w-4xl mx-auto'>
-        <h1 className='text-4xl font-bold text-center mb-8 text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-blue-500'>
-          Quick Index
-        </h1>
+        <div className='flex flex-col'>
+          <button
+            onClick={handleLogoClick}
+            className='text-4xl font-bold text-center mb-8 text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-blue-500'
+          >
+            Quick Index
+          </button>
+        </div>
 
         <div className='bg-gray-800 rounded-lg p-8 mb-8 shadow-lg min-h-[200px] flex items-center justify-center'>
-          <div className='text-center leading-relaxed tracking-wide'>
+          <div className='text-center leading-relaxed tracking-wide '>
             {quoteToType ? (
               renderQuote()
             ) : (
@@ -258,7 +311,7 @@ const Circuit: React.FC = () => {
               </p>
               <p className='text-gray-400'>Characters to improve:</p>
             </div>
-            <KeyboardDiagram mistypedKeyLabels={mistypedKeyLabels} />
+            <Keyboard mistypedKeys={mistypedKeyLabels} />
             <button
               onClick={resetTest}
               className='bg-gradient-to-r from-cyan-500 to-blue-500 text-white px-8 py-3 rounded-lg hover:from-cyan-600 hover:to-blue-600 transition-all transform hover:scale-105 mt-4'
