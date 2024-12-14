@@ -55,7 +55,6 @@ const Keyboard = ({ mistypedKeys = new Set() }) => {
           ${isMistyped ? 'bg-red-900/50' : 'hover:bg-gray-700'}
         `}
       >
-        {/* Gradient border effect */}
         <div 
           className={`
             absolute -inset-0.5 
@@ -69,7 +68,6 @@ const Keyboard = ({ mistypedKeys = new Set() }) => {
           `}
         />
 
-        {/* Key content */}
         <div className={`
           relative 
           w-full h-full 
@@ -84,7 +82,6 @@ const Keyboard = ({ mistypedKeys = new Set() }) => {
           {label}
         </div>
 
-        {/* Glow effect */}
         {isMistyped && (
           <div className="absolute inset-0 rounded-lg bg-red-500/50 bold-sm" />
         )}
@@ -95,11 +92,9 @@ const Keyboard = ({ mistypedKeys = new Set() }) => {
   return (
     <div className="w-full max-w-4xl mx-auto p-4">
       <div className="bg-gray-800/50 rounded-xl p-6 shadow-2xl">
-        {/* Keyboard body with gradient border */}
         <div className="relative">
           <div className="absolute -inset-0.5 bg-gradient-to-r from-cyan-500 to-blue-500 rounded-lg opacity-75 blur"></div>
           <div className="relative bg-gray-900 rounded-lg p-4">
-            {/* Keyboard rows */}
             {keyboardLayout.map((row, rowIndex) => (
               <div key={rowIndex} className="flex justify-center mb-1 last:mb-0">
                 {row.map((key, keyIndex) => (

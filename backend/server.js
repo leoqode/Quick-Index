@@ -54,7 +54,7 @@ const User = mongoose.model("User", userSchema);
 module.exports = User;
 
 const TeacherSchema = new mongoose.Schema({
-  _id: { type: String, required: true }, // Use custom ID
+  _id: { type: String, required: true }, 
   fname: { type: String, required: true },
   lname: { type: String, required: true },
   subjects_taught: { type: String, required: true },
@@ -202,8 +202,7 @@ const authMiddleware = (req, res, next) => {
 
   try {
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    console.log("Decoded token:", decoded); // Log the decoded token
-    req.userId = decoded.userId; // Attach userId to the request object
+    req.userId = decoded.userId;
     next();
   } catch (error) {
     console.error("Error decoding token:", error.message);
@@ -368,16 +367,34 @@ app.post("/api/race", authMiddleware, async (req, res) => {
 
 app.get("/api/race-history", authMiddleware, async (req, res) => {
   try {
+    const { page = 1, limit = 9 } = req.query; 
+    const skip = (page - 1) * limit;
+
     const races = await raceHistory
       .find({ userId: req.userId })
-      .sort({ createdAt: -1 }); // Sort by createdAt in descending order
+      .sort({ date: -1 }) 
+      .skip(parseInt(skip))
+      .limit(parseInt(limit)); 
 
-    res.status(200).json(races);
+    const totalCount = await raceHistory.countDocuments({ userId: req.userId }); 
+    res.status(200).json({ 
+      races: races.map(race => ({
+        id: race._id,
+        date: race.date,
+        wpm: race.wpm,
+        accuracy: race.accuracy,
+        timetocomplete: race.timetocomplete,
+        quote: race.quote,
+        charsToImprove: race.charsToImprove
+      })), 
+      totalCount 
+    });
   } catch (error) {
     console.error("Error fetching race history:", error);
     res.status(500).json({ error: "Failed to fetch race history" });
   }
 });
+
 
 app.listen(PORT, () => {
   console.log(`Server running on http://localhost:${PORT}`);

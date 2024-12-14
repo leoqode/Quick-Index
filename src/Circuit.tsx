@@ -4,8 +4,11 @@ import Keyboard from "./KeyboardDiagram";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "./AuthContext";
 import axios from "axios";
+import BackButton from "./BackButton";
+
+
 const Circuit: React.FC = () => {
-  const { isAuthenticated } = useAuth(); // Assuming `useAuth` provides this
+  const { isAuthenticated } = useAuth(); 
   const navigate = useNavigate();
   const {token} = useAuth();
   const [quoteToType, setQuoteToType] = useState("");
@@ -98,15 +101,14 @@ const Circuit: React.FC = () => {
 
   const handleLogoClick = () => {
     if (isAuthenticated) {
-      navigate("/main-page"); // Replace "/main" with the route for the main page
+      navigate("/main-page"); 
     } else {
-      navigate("/"); // Replace "/splash" with the route for the splash page
+      navigate("/"); 
     }
   };
 
   const fetchQuote = async () => {
     try {
-      // Fetch the quote of the day
       const response = await fetch("Http://localhost:5000/api/qotd", {
         headers: {
           "Content-Type": "application/json",
@@ -272,6 +274,7 @@ const Circuit: React.FC = () => {
   return (
     <div className='min-h-screen bg-gray-900 text-white p-8'>
       <div className='max-w-4xl mx-auto'>
+        <BackButton/>
         <div className='flex flex-col'>
           <button
             onClick={handleLogoClick}

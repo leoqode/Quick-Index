@@ -27,7 +27,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
       setUser(JSON.parse(storedUser));
       setToken(storedToken);
     }
-    setLoading(false); // Mark as finished checking auth status
+    setLoading(false); 
   }, []);
 
   const login = (token: string, user: { username: string; email: string }) => {
@@ -47,9 +47,8 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     navigate("/auth");
   };
 
-  // Wait until loading is finished before rendering children
   if (loading) {
-    return <div>Loading...</div>; // You can replace this with a spinner or other loading UI
+    return <div>Loading...</div>; 
   }
 
   return (

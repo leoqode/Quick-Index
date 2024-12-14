@@ -37,7 +37,6 @@ const SplashPage = () => {
           </div>
         </div>
 
-        {/* Action Buttons */}
         <div className="flex flex-col sm:flex-row justify-center gap-4">
           <button
             onClick={handleGuestAccess}
@@ -53,7 +52,6 @@ const SplashPage = () => {
           </button>
         </div>
 
-        {/* Footer */}
         <div className="text-gray-500 mt-12">
           <p>Ready to improve your typing speed?</p>
         </div>

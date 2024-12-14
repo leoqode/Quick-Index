@@ -57,12 +57,9 @@ const MainPage = () => {
 
   return (
     <div className='relative min-h-screen bg-gradient-to-br from-gray-900 via-black to-gray-900 text-white flex flex-col items-center justify-center p-4 overflow-hidden'>
-      {/* Animated Gradient Overlays */}
       <div className='absolute inset-0 overflow-hidden'>
-        {/* Pulsing gradient layer */}
         <div className='absolute inset-0 bg-gradient-to-r from-cyan-500/10 to-blue-500/10 opacity-30 animate-[pulse_10s_infinite_alternate]' />
 
-        {/* Floating particles */}
         {Array.from({ length: 10 }).map((_, i) => (
           <div
             key={i}
@@ -77,7 +74,6 @@ const MainPage = () => {
       </div>
 
       <div className='relative z-10 max-w-5xl w-full text-center space-y-12'>
-        {/* Header */}
         <div className='space-y-6'>
           <h1
             className='text-6xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-blue-500 
@@ -89,7 +85,7 @@ const MainPage = () => {
           </h1>
           <p
             className="text-xl text-gray-400 tracking-wide inline-block relative overflow-hidden whitespace-nowrap 
-                       after:content-[''] after:block after:w-full after:h-full after:bg-gradient-to-r 
+                       after:content-[''] after:block after:w-full after:h-full 
                        after:from-cyan-400/20 after:to-blue-500/20 after:absolute after:left-0 after:top-0
                        animate-typing"
             style={{
@@ -100,7 +96,6 @@ const MainPage = () => {
           </p>
         </div>
 
-        {/* Features Grid */}
         <div className='grid grid-cols-1 md:grid-cols-3 gap-6 mb-12'>
           {features.map((feature, index) => (
             <div
@@ -144,9 +139,8 @@ const MainPage = () => {
                        animate-[pulse_3s_infinite]'
           >
             <span className='relative z-10'>Start a Race</span>
-            <Activity className='ml-2 w-5 h-5 opacity-0 group-hover:opacity-100 transition-all' />
+            <Activity className='ml-2 w-5 h-5 opacity-100 transition-all' />
 
-            {/* Particle trail */}
             <div className='absolute inset-0 flex justify-center items-center pointer-events-none'>
               <div
                 className='w-0 h-0 border-t-[10px] border-t-white border-l-[6px] border-l-transparent border-r-[6px] border-r-transparent 
@@ -162,7 +156,7 @@ const MainPage = () => {
                        flex items-center justify-center shadow-lg hover:shadow-2xl group'
           >
             <span className='z-10'>View Leaderboard</span>
-            <Trophy className='ml-2 w-5 h-5 opacity-0 group-hover:opacity-100 transition-all' />
+            <Trophy className='ml-2 w-5 h-5 opacity-100 transition-all' />
             <span
               className='absolute inset-0 rounded-lg pointer-events-none 
                              bg-gradient-to-r from-cyan-400 to-blue-500 opacity-0 group-hover:opacity-20 
@@ -171,7 +165,6 @@ const MainPage = () => {
           </button>
         </div>
 
-        {/* Profile & Settings */}
         <div className='flex flex-col sm:flex-row justify-center gap-6 mt-6'>
           <button
             onClick={goToProfile}
@@ -180,7 +173,7 @@ const MainPage = () => {
                        flex items-center justify-center shadow-lg hover:shadow-2xl group'
           >
             <span className='z-10'>Profile</span>
-            <Users className='ml-2 w-5 h-5 opacity-0 group-hover:opacity-100 transition-all' />
+            <Users className='ml-2 w-5 h-5 opacity-100 transition-all' />
             <span
               className='absolute inset-0 rounded-lg pointer-events-none 
                              bg-gradient-to-r from-cyan-400 to-blue-500 opacity-0 group-hover:opacity-20 
@@ -195,7 +188,7 @@ const MainPage = () => {
                        flex items-center justify-center shadow-lg hover:shadow-2xl group'
           >
             <span className='z-10'>Settings</span>
-            <Settings className='ml-2 w-5 h-5 opacity-0 group-hover:opacity-100 transition-all' />
+            <Settings className='ml-2 w-5 h-5 opacity-100 transition-all' />
             <span
               className='absolute inset-0 rounded-lg pointer-events-none 
                              bg-gradient-to-r from-cyan-400 to-blue-500 opacity-0 group-hover:opacity-20 
@@ -204,7 +197,6 @@ const MainPage = () => {
           </button>
         </div>
 
-        {/* Footer */}
         <div className='text-gray-500 mt-12 flex flex-col sm:flex-row justify-center items-center space-y-4 sm:space-y-0 sm:space-x-4'>
           <button
             title='sign-out'
@@ -219,7 +211,6 @@ const MainPage = () => {
         </div>
       </div>
 
-      {/* Keyframes */}
       <style>
         {`
           @keyframes flicker {
