@@ -1,14 +1,16 @@
 import React, { useState, useEffect, useRef } from "react";
 import Keyboard from "./KeyboardDiagram";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { useAuth } from "./AuthContext";
 import axios from "axios";
 import BackButton from "./BackButton";
+import TrainingCourse from "./TrainingCourse";
 
 
 const Circuit: React.FC = () => {
   const { isAuthenticated } = useAuth(); 
   const navigate = useNavigate();
+  const location = useLocation();
   const {token} = useAuth();
   const [quoteToType, setQuoteToType] = useState("");
   const [userInput, setUserInput] = useState("");
@@ -30,8 +32,38 @@ const Circuit: React.FC = () => {
     "—": "-",
     "…": "...",
   };
-
+  const resetEntireState = () => {
+    setQuoteToType("");
+    setUserInput("");
+    setCurrentInputWord("");
+    setStartTime(null);
+    setWpm(null);
+    setIsQuoteLoaded(false);
+    setMistypedKeyLabels(new Set());
+    setWordImprovementMap({});
+  };
   const audioRef = useRef<HTMLAudioElement | null>(null);
+
+  useEffect(() => {
+    if (location.state?.trainingQuote) {
+      resetEntireState();
+
+      const trainingQuote = location.state.trainingQuote;
+      
+      const timer = setTimeout(() => {
+        setQuoteToType(trainingQuote);
+        setIsQuoteLoaded(true);
+      }, 50);
+
+      window.history.replaceState({}, document.title);
+
+      return () => clearTimeout(timer);
+    } else {
+      fetchQuote();
+    }
+  }, [location.state]);
+
+
 
   useEffect(() => {
     audioRef.current = new Audio("/audiomass-output.mp3");
@@ -320,6 +352,7 @@ const Circuit: React.FC = () => {
             >
               Try Another Quote
             </button>
+            <TrainingCourse charsToImprove={mistypedKeyLabels}/>
           </div>
         )}
       </div>

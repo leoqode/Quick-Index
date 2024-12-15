@@ -4,9 +4,13 @@ const mongoose = require("mongoose");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const cors = require("cors");
-
+const OpenAI = require("openai");
 const app = express();
 const PORT = process.env.PORT || 3001;
+
+const openai = new OpenAI({
+  apiKey: process.env.VITE_PROMPT_API_KEY,
+});
 
 app.use(cors());
 app.use(express.json());
@@ -54,7 +58,7 @@ const User = mongoose.model("User", userSchema);
 module.exports = User;
 
 const TeacherSchema = new mongoose.Schema({
-  _id: { type: String, required: true }, 
+  _id: { type: String, required: true },
   fname: { type: String, required: true },
   lname: { type: String, required: true },
   subjects_taught: { type: String, required: true },
@@ -342,7 +346,8 @@ app.post("/api/race", authMiddleware, async (req, res) => {
   console.log("User ID:", req.userId);
 
   try {
-    const { date, wpm, accuracy, timetocomplete, quote, charsToImprove } = req.body;
+    const { date, wpm, accuracy, timetocomplete, quote, charsToImprove } =
+      req.body;
 
     const newRace = new raceHistory({
       userId: req.userId,
@@ -367,27 +372,27 @@ app.post("/api/race", authMiddleware, async (req, res) => {
 
 app.get("/api/race-history", authMiddleware, async (req, res) => {
   try {
-    const { page = 1, limit = 9 } = req.query; 
+    const { page = 1, limit = 9 } = req.query;
     const skip = (page - 1) * limit;
 
     const races = await raceHistory
       .find({ userId: req.userId })
-      .sort({ date: -1 }) 
+      .sort({ date: -1 })
       .skip(parseInt(skip))
-      .limit(parseInt(limit)); 
+      .limit(parseInt(limit));
 
-    const totalCount = await raceHistory.countDocuments({ userId: req.userId }); 
-    res.status(200).json({ 
-      races: races.map(race => ({
+    const totalCount = await raceHistory.countDocuments({ userId: req.userId });
+    res.status(200).json({
+      races: races.map((race) => ({
         id: race._id,
         date: race.date,
         wpm: race.wpm,
         accuracy: race.accuracy,
         timetocomplete: race.timetocomplete,
         quote: race.quote,
-        charsToImprove: race.charsToImprove
-      })), 
-      totalCount 
+        charsToImprove: race.charsToImprove,
+      })),
+      totalCount,
     });
   } catch (error) {
     console.error("Error fetching race history:", error);
@@ -404,11 +409,11 @@ app.get("/api/leaderboard", authMiddleware, async (req, res) => {
     const races = await raceHistory.aggregate([
       {
         $lookup: {
-          from: "users", 
+          from: "users",
           localField: "userId",
           foreignField: "_id",
-          as: "user"
-        }
+          as: "user",
+        },
       },
       { $unwind: "$user" },
       {
@@ -417,19 +422,19 @@ app.get("/api/leaderboard", authMiddleware, async (req, res) => {
           username: "$user.username",
           wpm: 1,
           accuracy: 1,
-          date: 1
-        }
+          date: 1,
+        },
       },
-      { $sort: { wpm: -1 } }, 
+      { $sort: { wpm: -1 } },
       { $skip: parseInt(skip) },
-      { $limit: parseInt(limit) }
+      { $limit: parseInt(limit) },
     ]);
 
     const totalCount = await raceHistory.countDocuments();
 
-    res.status(200).json({ 
+    res.status(200).json({
       races,
-      totalCount 
+      totalCount,
     });
   } catch (error) {
     console.error("Error fetching leaderboard:", error);
@@ -437,6 +442,49 @@ app.get("/api/leaderboard", authMiddleware, async (req, res) => {
   }
 });
 
+app.post("/api/generate-training-quote", async (req, res) => {
+  const missedChars = req.body.missedCharacters;
+
+  if (!missedChars || missedChars.length === 0) {
+    return res.status(400).json({ error: "There were no missed characters" });
+  }
+
+  try {
+    const response = await openai.chat.completions.create({
+      model: "gpt-4o-mini",
+      messages: [
+        {
+          role: "system",
+          content:
+            "You are a helpful assistant designed to create typing training exercises. Focus on generating sequences that utilize provided characters in diverse ways.",
+        },
+        {
+          role: "user",
+          content: `Generate a typing practice exercise consisting of 10-15 strings. The exercise should frequently use the following characters in various sequences: ${missedChars.join(
+            ", "
+          )}. For example, if the missed characters are 't', 'e', and 'r', the output should include sequences like 'teers', 'eeter', 'reet', 'teer', 'mother', 'tether', etc. Do not list them or number them just have the strings seperated by a space`,
+        },
+      ],
+    });
+
+    if (
+      response &&
+      response.choices &&
+      response.choices[0] &&
+      response.choices[0].message
+    ) {
+      const quote = response.choices[0].message.content.trim();
+      res.json({ quote });
+    } else {
+      throw new Error("Invalid API response structure.");
+    }
+
+    console.log("API Response:", response);
+  } catch (error) {
+    console.error("Error generating training course:", error.message);
+    res.status(500).json({ error: "Failed to generate training quote" });
+  }
+});
 
 app.listen(PORT, () => {
   console.log(`Server running on http://localhost:${PORT}`);
