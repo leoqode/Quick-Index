@@ -372,18 +372,40 @@ app.post("/api/race", authMiddleware, async (req, res) => {
 
 app.get("/api/race-history", authMiddleware, async (req, res) => {
   try {
-    const { page = 1, limit = 9 } = req.query;
-    const skip = (page - 1) * limit;
+    const { page, limit } = req.query;
 
-    const races = await raceHistory
+    if (page && limit) {
+      const skip = (page - 1) * parseInt(limit);
+      const races = await raceHistory
+        .find({ userId: req.userId })
+        .sort({ date: -1 })
+        .skip(skip)
+        .limit(parseInt(limit));
+
+      const totalCount = await raceHistory.countDocuments({
+        userId: req.userId,
+      });
+
+      return res.status(200).json({
+        races: races.map((race) => ({
+          id: race._id,
+          date: race.date,
+          wpm: race.wpm,
+          accuracy: race.accuracy,
+          timetocomplete: race.timetocomplete,
+          quote: race.quote,
+          charsToImprove: race.charsToImprove,
+        })),
+        totalCount,
+      });
+    }
+
+    const allRaces = await raceHistory
       .find({ userId: req.userId })
-      .sort({ date: -1 })
-      .skip(parseInt(skip))
-      .limit(parseInt(limit));
+      .sort({ date: -1 });
 
-    const totalCount = await raceHistory.countDocuments({ userId: req.userId });
-    res.status(200).json({
-      races: races.map((race) => ({
+    return res.status(200).json({
+      races: allRaces.map((race) => ({
         id: race._id,
         date: race.date,
         wpm: race.wpm,
@@ -392,7 +414,7 @@ app.get("/api/race-history", authMiddleware, async (req, res) => {
         quote: race.quote,
         charsToImprove: race.charsToImprove,
       })),
-      totalCount,
+      totalCount: allRaces.length,
     });
   } catch (error) {
     console.error("Error fetching race history:", error);
@@ -460,9 +482,16 @@ app.post("/api/generate-training-quote", async (req, res) => {
         },
         {
           role: "user",
-          content: `Generate a typing practice exercise consisting of 10-15 strings. The exercise should frequently use the following characters in various sequences: ${missedChars.join(
-            ", "
-          )}. For example, if the missed characters are 't', 'e', and 'r', the output should include sequences like 'teers', 'eeter', 'reet', 'teer', 'mother', 'tether', etc. Do not list them or number them just have the strings seperated by a space`,
+          content: `You are generating short, repetitive, and structured typing practice strings for a typing web app. The goal is to help users practice specific characters they frequently mistype or miss. These practice strings should emphasize clusters and patterns that include the provided characters, but they must meet the following criteria:
+          Focus on Mistyped Characters: Incorporate the provided characters heavily (e.g., 'e', 'r', 't').
+          Cluster-Based Patterns: Create small, logical clusters of characters that feel natural to type (e.g., 'teet', 'reet', 'eater') rather than random gibberish or long sentences.
+          Varying Combinations: Mix the characters into diverse combinations but keep each string between 4 and 8 characters long.
+          No All Caps or Special Characters: Use only lowercase letters and avoid special symbols, numbers, or all caps.
+          Repetition for Muscle Memory: Repeat certain combinations occasionally but don’t make the strings overly repetitive or predictable.
+          Output Example: If the input characters are ['e', 'r', 't'], output strings like: ['teet', 'reet', 'eater', 'teret', 'eter', 'teeerr', 'tertee'].
+          Input: ['e', 'r', 't']
+          Output: ['teet', 'reet', 'eater', 'teret', 'eter', 'teeerr', 'tertee']
+          Now generate practice strings for the following characters: ${missedChars}. And make sure you are not generating anything else simply generate the strings and seperate them by a space`,
         },
       ],
     });

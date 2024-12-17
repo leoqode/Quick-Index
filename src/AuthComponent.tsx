@@ -22,195 +22,156 @@ const AuthComponent: React.FC = () => {
     setErrorMessage("");
     setSuccessMessage("");
 
-    const endpoint = isLogin
-      ? "http://localhost:3001/api/login"
-      : "http://localhost:3001/api/register";
-
-    const payload = isLogin
-      ? { email, username, password }
-      : { fname: firstName, lname: lastName, username, email, password };
-
     try {
-      const response = await axios.post(endpoint, payload);
+      const response = await axios.post(
+        `http://localhost:3001/api/${isLogin ? "login" : "register"}`,
+        isLogin
+          ? { email, username, password }
+          : { fname: firstName, lname: lastName, username, email, password }
+      );
 
       if (response.status === 200) {
-        const { token, user } = response.data; 
+        const { token, user } = response.data;
         login(token, user);
-        setSuccessMessage(
-          isLogin ? "Login successful!" : "Registration successful!"
-        );
-        navigate("/main-page"); 
+        navigate("/main-page");
       }
     } catch (error: any) {
       setErrorMessage(
         error.response?.data?.message ||
-          (isLogin
-            ? "Login failed. Please check your credentials."
-            : "Registration failed. Please try again.")
+          (isLogin ? "login failed" : "registration failed")
       );
     }
   };
 
   return (
-    <div className='min-h-screen bg-gray-900 text-white p-8'>
-      <div className='max-w-md mx-auto'>
-        <div className='mb-8  px-4 py-2 rounded-lg flex items-center gap-2'>
+    <div className='min-h-screen bg-gray-900 text-white p-8 font-mono'>
+      <div className='max-w-md mx-auto space-y-8'>
+        <div className='flex items-center justify-between'>
           <BackButton />
+          <div className='text-xs tracking-[0.2em] uppercase text-gray-500'>
+            {isLogin ? "login" : "register"}
+          </div>
         </div>
 
-        <div className='bg-gray-800 rounded-lg p-8 shadow-lg'>
-          <div className='flex rounded-lg bg-gray-900 p-1 mb-8'>
+        <div className='space-y-8'>
+          <div className='flex gap-4'>
             <button
-              className={`flex-1 py-2 rounded-md transition-all ${
-                isLogin
-                  ? "bg-gradient-to-r from-cyan-500 to-blue-500 text-white"
-                  : "text-gray-400 hover:text-white"
-              }`}
               onClick={() => setIsLogin(true)}
+              className={`flex-1 py-2 text-xs tracking-[0.2em] uppercase transition-colors ${
+                isLogin ? "text-cyan-400" : "text-gray-500"
+              }`}
             >
-              Login
+              login
             </button>
             <button
-              className={`flex-1 py-2 rounded-md transition-all ${
-                !isLogin
-                  ? "bg-gradient-to-r from-cyan-500 to-blue-500 text-white"
-                  : "text-gray-400 hover:text-white"
-              }`}
               onClick={() => setIsLogin(false)}
+              className={`flex-1 py-2 text-xs tracking-[0.2em] uppercase transition-colors ${
+                !isLogin ? "text-cyan-400" : "text-gray-500"
+              }`}
             >
-              Sign Up
+              register
             </button>
           </div>
 
-          <h2 className='text-2xl font-bold text-center mb-6 text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-blue-500'>
-            {isLogin ? "Welcome Back" : "Create Account"}
-          </h2>
-
           {!isLogin && (
-            <div className='space-y-4 mb-6'>
-              <button className='w-full bg-gray-700 hover:bg-gray-600 text-white py-3 rounded-lg transition-all flex items-center justify-center gap-2'>
-                Continue with Google
+            <div className='space-y-4'>
+              <button className='w-full bg-transparent border border-gray-800 hover:border-gray-700 px-4 py-3 rounded text-xs tracking-[0.2em] uppercase text-gray-400 hover:text-gray-300 transition-colors flex items-center justify-center gap-2'>
+                <Github className='w-4 h-4' />
+                github
               </button>
-              <button className='w-full bg-gray-700 hover:bg-gray-600 text-white py-3 rounded-lg transition-all flex items-center justify-center gap-2'>
-                Continue with GitHub
-                <Github />
-              </button>
+
               <div className='relative'>
                 <div className='absolute inset-0 flex items-center'>
-                  <div className='w-full border-t border-gray-600'></div>
+                  <div className='w-full border-t border-gray-800'></div>
                 </div>
-                <div className='relative flex justify-center text-sm'>
-                  <span className='px-2 bg-gray-800 text-gray-400'>
-                    Or continue with email
-                  </span>
+                <div className='relative flex justify-center text-xs tracking-[0.2em] uppercase'>
+                  <span className='px-4 bg-gray-900 text-gray-500'>or</span>
                 </div>
               </div>
             </div>
           )}
 
-          <form onSubmit={handleSubmit} className='space-y-4'>
+          <form onSubmit={handleSubmit} className='space-y-6'>
             {!isLogin && (
               <div className='grid grid-cols-2 gap-4'>
-                <div>
-                  <label className='block text-gray-400 mb-2'>First Name</label>
-                  <input
-                    name='firstName'
-                    title='First Name'
-                    type='text'
-                    value={firstName}
-                    onChange={(e) => setFirstName(e.target.value)}
-                    className='w-full bg-gray-900 text-white px-4 py-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-cyan-400 transition-all'
-                    required
-                  />
-                </div>
-                <div>
-                  <label className='block text-gray-400 mb-2'>Last Name</label>
-                  <input
-                    name='lastName'
-                    title='Last Name'
-                    type='text'
-                    value={lastName}
-                    onChange={(e) => setLastName(e.target.value)}
-                    className='w-full bg-gray-900 text-white px-4 py-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-cyan-400 transition-all'
-                    required
-                  />
-                </div>
+                {[
+                  {
+                    label: "first name",
+                    value: firstName,
+                    setter: setFirstName,
+                  },
+                  { label: "last name", value: lastName, setter: setLastName },
+                ].map((field) => (
+                  <div key={field.label} className='space-y-2'>
+                    <div className='text-xs tracking-[0.2em] uppercase text-gray-500'>
+                      {field.label}
+                    </div>
+                    <input
+                      title='fname'
+                      type='text'
+                      value={field.value}
+                      onChange={(e) => field.setter(e.target.value)}
+                      className='w-full bg-transparent border border-gray-800 focus:border-gray-700 px-4 py-2 rounded text-gray-200 focus:outline-none transition-colors'
+                      required
+                    />
+                  </div>
+                ))}
               </div>
             )}
 
-            <div>
-              <label className='block text-gray-400 mb-2'>{"Email"}</label>
-              <input
-                name='email'
-                title='Email'
-                type='email'
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                className='w-full bg-gray-900 text-white px-4 py-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-cyan-400 transition-all'
-                required
-              />
-            </div>
-            <div>
-              <label className='block text-gray-400 mb-2'>{"Username"}</label>
-              <input
-                name='username'
-                title='username'
-                type='username'
-                value={username}
-                onChange={(e) => setUsername(e.target.value)}
-                className='w-full bg-gray-900 text-white px-4 py-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-cyan-400 transition-all'
-                required
-              />
-            </div>
+            {[
+              { label: "email", value: email, setter: setEmail, type: "email" },
+              {
+                label: "username",
+                value: username,
+                setter: setUsername,
+                type: "text",
+              },
+              {
+                label: "password",
+                value: password,
+                setter: setPassword,
+                type: "password",
+              },
+            ].map((field) => (
+              <div key={field.label} className='space-y-2'>
+                <div className='text-xs tracking-[0.2em] uppercase text-gray-500'>
+                  {field.label}
+                </div>
+                <input
+                  title='lname'
+                  type={field.type}
+                  value={field.value}
+                  onChange={(e) => field.setter(e.target.value)}
+                  className='w-full bg-transparent border border-gray-800 focus:border-gray-700 px-4 py-2 rounded text-gray-200 focus:outline-none transition-colors'
+                  required
+                />
+              </div>
+            ))}
 
-            <div>
-              <label className='block text-gray-400 mb-2'>Password</label>
-              <input
-                name='password'
-                title='Password'
-                type='password'
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                className='w-full bg-gray-900 text-white px-4 py-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-cyan-400 transition-all'
-                required
-              />
-            </div>
-
-            {isLogin && (
-              <div className='flex justify-end'>
-                <button
-                  type='button'
-                  className='text-cyan-400 hover:text-cyan-300 text-sm'
-                >
-                  Forgot Password?
-                </button>
+            {errorMessage && (
+              <div className='text-xs tracking-[0.2em] uppercase text-red-400 text-center'>
+                {errorMessage}
               </div>
             )}
 
             <button
               type='submit'
-              className='w-full bg-gradient-to-r from-cyan-500 to-blue-500 text-white py-3 rounded-lg hover:from-cyan-600 hover:to-blue-600 transition-all transform hover:scale-105'
+              className='w-full bg-transparent border border-gray-800 hover:border-cyan-400/40 px-4 py-3 rounded text-xs tracking-[0.2em] uppercase text-gray-400 hover:text-cyan-400 transition-colors'
             >
-              {isLogin ? "Login" : "Create Account"}
+              {isLogin ? "login" : "create account"}
             </button>
+
+            <div className='text-center text-xs tracking-[0.2em] uppercase text-gray-500'>
+              {isLogin ? "need an account? " : "have an account? "}
+              <button
+                onClick={() => setIsLogin(!isLogin)}
+                className='text-gray-400 hover:text-cyan-400 transition-colors'
+              >
+                {isLogin ? "register" : "login"}
+              </button>
+            </div>
           </form>
-
-          {errorMessage && (
-            <p className='text-red-500 mt-4 text-center'>{errorMessage}</p>
-          )}
-          {successMessage && (
-            <p className='text-green-500 mt-4 text-center'>{successMessage}</p>
-          )}
-
-          <p className='text-center mt-6 text-gray-400'>
-            {isLogin ? "Don't have an account? " : "Already have an account? "}
-            <button
-              onClick={() => setIsLogin(!isLogin)}
-              className='text-cyan-400 hover:text-cyan-300'
-            >
-              {isLogin ? "Sign up" : "Login"}
-            </button>
-          </p>
         </div>
       </div>
     </div>

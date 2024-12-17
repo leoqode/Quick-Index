@@ -1,59 +1,132 @@
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { Keyboard, Zap, Quote, Activity } from "lucide-react";
 
 const SplashPage = () => {
   const navigate = useNavigate();
+  const [demoInput, setDemoInput] = useState("");
+  const demoQuote = "welcome to quick index!";
 
-  const handleGuestAccess = () => {
-    navigate('/circuit'); 
+  const renderDemoQuote = () => {
+    const stringToType = demoQuote.split("");
+    const inputString = demoInput.split("");
+    let foundError = false;
+
+    return stringToType.map((char, charIndex) => {
+      let className = "font-mono text-2xl transition-colors duration-200";
+      
+      if (!foundError && inputString[charIndex] === char) {
+        className += " text-cyan-400";
+      } else if (inputString[charIndex]) {
+        foundError = true;
+        className += " text-red-500";
+      } else {
+        className += " text-gray-500";
+      }
+
+      if (charIndex === inputString.length) {
+        className += " border-b-2 border-cyan-400 animate-pulse";
+      }
+
+      return <span key={charIndex} className={className}>{char}</span>;
+    });
   };
-  const handleSigninLogin = () => {
-    navigate('/auth')
-  }
+
+  const handleDemoInput = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setDemoInput(e.target.value);
+    if (e.target.value === demoQuote) {
+      setTimeout(() => navigate('/circuit'), 500);
+    }
+  };
+
+  const features = [
+    {
+      icon: Activity,
+      title: "real-time analysis",
+      description: "track your wpm and accuracy as you type"
+    },
+    {
+      icon: Keyboard,
+      title: "keyboard heatmap",
+      description: "visualize your improvement areas"
+    },
+    {
+      icon: Quote,
+      title: "custom quotes",
+      description: "practice with fresh content every time"
+    }
+  ];
 
   return (
-    <div className="min-h-screen bg-gray-900 text-white flex flex-col items-center justify-center p-8">
-      <div className="max-w-4xl w-full text-center space-y-12">
-        <div className="space-y-6">
-          <h1 className="text-6xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-blue-500">
-            Quick Index
-          </h1>
-          <p className="text-xl text-gray-400">
-            Master your typing speed. Track your progress. Become legendary.
-          </p>
-        </div>
-
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
-          <div className="bg-gray-800 rounded-lg p-6 shadow-lg">
-            <div className="text-cyan-400 text-xl mb-2">Real-time Analysis</div>
-            <p className="text-gray-400">Track your WPM and accuracy as you type</p>
+    <div className="min-h-screen bg-gray-900 text-white p-8 font-mono">
+      <div className="max-w-4xl mx-auto space-y-16">
+        <div className="text-center space-y-4">
+          <div className="text-xs tracking-[0.2em] uppercase text-gray-500">
+            welcome to
           </div>
-          <div className="bg-gray-800 rounded-lg p-6 shadow-lg">
-            <div className="text-cyan-400 text-xl mb-2">Keyboard Heatmap</div>
-            <p className="text-gray-400">Visualize your improvement areas</p>
+          <div className="text-4xl font-light text-gray-200 tracking-tight">
+            quick index
           </div>
-          <div className="bg-gray-800 rounded-lg p-6 shadow-lg">
-            <div className="text-cyan-400 text-xl mb-2">Custom Quotes</div>
-            <p className="text-gray-400">Practice with fresh content every time</p>
+          <div className="text-sm text-gray-500">
+            master your typing speed. track your progress. become legendary.
           </div>
         </div>
 
-        <div className="flex flex-col sm:flex-row justify-center gap-4">
+        <div className="relative bg-gray-800/50 rounded-lg p-8 border border-gray-800/30 backdrop-blur-sm">
+          <div className="text-center space-y-6">
+            <div className="text-xs tracking-[0.2em] uppercase text-gray-500">
+              try it now
+            </div>
+            <div className="text-center leading-relaxed">
+              {renderDemoQuote()}
+            </div>
+            <input
+              type="text"
+              value={demoInput}
+              onChange={handleDemoInput}
+              className="w-full bg-transparent border border-gray-800/30 text-xl p-4 rounded-lg font-mono focus:border-cyan-400/40 focus:outline-none transition-colors"
+              placeholder="start typing..."
+            />
+          </div>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+          {features.map((feature) => (
+            <div key={feature.title} 
+                 className="group relative bg-gray-800/50 rounded-lg p-8 border border-gray-800/30">
+              <div className="space-y-4">
+                <feature.icon className="w-6 h-6 text-cyan-400" />
+                <div className="text-sm tracking-[0.2em] uppercase text-gray-300">
+                  {feature.title}
+                </div>
+                <div className="text-sm text-gray-500 leading-relaxed">
+                  {feature.description}
+                </div>
+              </div>
+              <div className="absolute inset-x-0 bottom-0 h-0.5 bg-gradient-to-r from-transparent via-cyan-500/50 to-transparent transform scale-x-0 group-hover:scale-x-100 transition-transform duration-500" />
+            </div>
+          ))}
+        </div>
+
+        <div className="flex flex-col sm:flex-row justify-center gap-6">
           <button
-            onClick={handleGuestAccess}
-            className="bg-gradient-to-r from-cyan-500 to-blue-500 text-white px-8 py-4 rounded-lg hover:from-cyan-600 hover:to-blue-600 transition-all transform hover:scale-105 text-lg font-semibold min-w-[200px]"
+            onClick={() => navigate('/circuit')}
+            className="group relative bg-gray-800/80 hover:bg-gray-800/60 text-gray-200 px-8 py-4 rounded-lg border border-gray-800/30 text-sm tracking-[0.2em] uppercase"
           >
-            Start as Guest
+            <span className="relative z-10 flex items-center justify-center">
+              start as guest
+              <Zap className="ml-2 w-4 h-4" />
+            </span>
+            <div className="absolute inset-x-0 bottom-0 h-0.5 bg-gradient-to-r from-transparent via-cyan-500/50 to-transparent transform scale-x-0 group-hover:scale-x-100 transition-transform duration-500" />
           </button>
-          <button
-            onClick={handleSigninLogin}
-            className="bg-gray-800 text-white px-8 py-4 rounded-lg hover:bg-gray-700 transition-all transform hover:scale-105 text-lg font-semibold min-w-[200px]"
-          >
-            Login
-          </button>
-        </div>
 
-        <div className="text-gray-500 mt-12">
-          <p>Ready to improve your typing speed?</p>
+          <button
+            onClick={() => navigate('/auth')}
+            className="group relative bg-gray-800/50 hover:bg-gray-800/30 text-gray-400 hover:text-gray-200 px-8 py-4 rounded-lg border border-gray-800/30 text-sm tracking-[0.2em] uppercase"
+          >
+            <span className="relative z-10">login</span>
+            <div className="absolute inset-x-0 bottom-0 h-0.5 bg-gradient-to-r from-transparent via-cyan-500/50 to-transparent transform scale-x-0 group-hover:scale-x-100 transition-transform duration-500" />
+          </button>
         </div>
       </div>
     </div>
