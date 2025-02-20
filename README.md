@@ -18,11 +18,11 @@ Quick Index aims to be more than just a typing test—it’s a personal typing c
 - Real-time WPM calculation  
 - Dynamic character and word highlighting  
 - Unlimited quotes for ongoing practice  
+- AI-driven analysis of typing patterns  
+- Personalized exercises targeting weak spots  
 
 **Upcoming**  
-- AI-driven analysis of typing patterns  
 - Hand-placement optimization recommendations  
-- Personalized exercises targeting weak spots  
 - Comprehensive progress tracking and visualization  
 
 ---
@@ -30,7 +30,6 @@ Quick Index aims to be more than just a typing test—it’s a personal typing c
 **Tech Stack**  
 - React  
 - TypeScript  
-- TensorFlow.js (Machine Learning)  
 - CSS3 with advanced animations  
 
 ---
@@ -63,10 +62,6 @@ Quick Index uses machine learning to analyze a range of factors that impact typi
 
 ---
 
-**Contributing**  
-We welcome contributions from anyone interested in improving the typing experience. Whether you specialize in machine learning, design user interfaces, or simply have a passion for typing, there’s a role for you in this project. To learn how to get started, please review our [CONTRIBUTING.md](CONTRIBUTING.md).
-
----
 
 **License**  
 This project is available under the MIT License. For more details, refer to the [LICENSE.md](LICENSE.md) file.
